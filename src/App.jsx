@@ -16,47 +16,41 @@ import "./styles/main.css";
 import { ThemeContext } from "./context/ThemeContext";
 
 export const App = () => {
-  const [theme, setTheme] = useState()
+  const [theme, setTheme] = useState();
 
+  // Инициализация темы при загрузке
   useEffect(() => {
-    const theme = localStorage.getItem('theme')
+    const savedTheme = localStorage.getItem("theme");
 
-    if (theme) {
-      setTheme(theme)
-      return
+    if (savedTheme) {
+      setTheme(savedTheme);
+      return;
     }
 
-    const isDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches;
-    if (isDarkMode) {
-      setTheme('dark')
-      return
-    }
+    const isDarkMode = window.matchMedia("(prefers-color-scheme: dark)").matches;
+    setTheme(isDarkMode ? "dark" : "light");
+  }, []);
 
-    setTheme('light')
-  }, [])
-
+  // Сохранение и применение темы
   useEffect(() => {
-    if (theme === 'light') {
-      document.body.classList.add('light')
-      document.body.classList.remove('dark')
-      localStorage.setItem('theme', 'light')
-      return
-    }
+    if (!theme) return;
 
-    if (theme === 'dark') {
-      document.body.classList.add('dark')
-      document.body.classList.remove('light')
-      localStorage.setItem('theme', 'dark')
-    }
-  }, [theme])
+    document.body.classList.add(theme);
+    document.body.classList.remove(theme === "dark" ? "light" : "dark");
+    localStorage.setItem("theme", theme);
+  }, [theme]);
 
-
+  // Функция переключения темы
+  const toggleTheme = () => {
+    setTheme((prevTheme) => (prevTheme === "dark" ? "light" : "dark"));
+  };
 
   return (
     <ThemeContext.Provider value={theme}>
-      <nav style={{ display: 'flex', marginLeft: 'auto', width: '300px' }}>
-        <button onClick={() => setTheme('light')}>Light</button>
-        <button onClick={() => setTheme('dark')}>Dark</button>
+      <nav style={{ display: "flex", marginLeft: "auto", width: "300px" }}>
+        <button onClick={toggleTheme}>
+           {theme === "dark" ? "Light" : "Dark"} Theme
+        </button>
       </nav>
       <Routes>
         <Route index element={<Welcome />} />
@@ -66,7 +60,6 @@ export const App = () => {
           <Route path="3" element={<StepThree />} />
           <Route path="4" element={<StepFour />} />
         </Route>
-
         <Route path="/thanks" element={<Thanks />} />
       </Routes>
     </ThemeContext.Provider>
